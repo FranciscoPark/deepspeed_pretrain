@@ -40,7 +40,7 @@ def set_seed(seed):
 def prepare_dataset(args):
     set_seed(args.seed)
     def get_dataset_indices(args):
-       
+        args.num_tokens *= 1000000000 
         num_docs = math.ceil(args.num_tokens / args.max_seq_len)
         indices = range(0, num_docs)
         args.num_docs = num_docs

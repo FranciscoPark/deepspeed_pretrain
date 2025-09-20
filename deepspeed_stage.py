@@ -168,7 +168,8 @@ def train(args):
     world_size = int(os.environ.get('WORLD_SIZE', 1))
     global_rank = int(os.environ.get('RANK', 0))
     args.world_size = world_size
-    # args.micro_batch = args.batch_size // world_size
+    args.accumulation_step = args.batch_size // world_size
+
     deepspeed_config = _dsconfig[args.zero_stage](args=args)
     torch.cuda.set_device(rank)
     # rank=rank, world_size=world_size
@@ -222,6 +223,11 @@ def train(args):
             step = client_sd['step']
         if global_rank == 0:
             print(f"Resumed from step {step}")
+    if args.continual:
+        _, client_sd = model.load_checkpoint(args.checkpoint_dir)
+        if global_rank == 0:
+            print(f"Continual from step {step} should be zero, learning rate should be small. current :{args.lr}")
+
 
     if args.use_wandb and global_rank == 0:
         wandb.init(
@@ -263,20 +269,6 @@ def train(args):
                             "step": step,
                             "learning_rate":curent_lr,
                         })
-
-            # if args.save_by == "epoch":
-            #     if step % steps_per_epoch == 0:
-            #         current_epoch = step // steps_per_epoch
-            #         if current_epoch % args.save_interval == 0 and rank == 0:
-            #             print(f"[Rank {rank}] Saving checkpoint at epoch {current_epoch}")
-            #             model.save_checkpoint(
-            #                 args.checkpoint_dir,
-            #                 tag=f"epoch{current_epoch}",
-            #                 client_state={'step': step, 'epoch': current_epoch}
-            #             )
-            #     valid_loss = compute_valid_loss(model, valid_dataloader, device, pad_token_id, config)
-            #     if rank == 0 and args.use_wandb:
-            #         wandb.log({"valid/loss": valid_loss, "step": step})
 
             if (args.save_by == "step") and (step % args.save_interval == 0):
                 print(f"[Rank {rank}] Saving checkpoint at step {step}")

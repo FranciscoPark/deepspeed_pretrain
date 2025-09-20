@@ -26,8 +26,8 @@ def add_setup_args(parser):
     group.add_argument('--split', type=str, default='train')
     group.add_argument('--text_column', type=str, default='text')
     group.add_argument('--train_dataset', type=str, default='train_dataset.jsonl')
-    group.add_argument('--train_dataset_path', type=str, default='/home/work/datasets/train-2048')
-    group.add_argument('--valid_dataset_path', type=str, default='/home/work/datasets/valid-2048')
+    group.add_argument('--train_dataset_path', type=str, default="/shared/erc/lab08/kslee/old_250617/datasets/text_processed/c4/llama3.1/train-2048")
+    group.add_argument('--valid_dataset_path', type=str, default="/shared/erc/lab08/kslee/old_250617/datasets/text_processed/c4/llama3.1/valid-2048")
     group.add_argument("--seed", action="store", default=1203, type=int)
 
 def add_model_args(parser):
@@ -47,12 +47,12 @@ def add_model_args(parser):
 
 def add_train_args(parser):
     group = parser.add_argument_group(title='Train')
-    group.add_argument('--batch_size', type=int, default=528)
-    group.add_argument('--lr', type=int, default=3e-5)
+    group.add_argument('--batch_size', type=int, default=128)
+    group.add_argument('--lr', type=int, default=3e-6)
     group.add_argument('--num_train_epochs', type=int, default=None)
     group.add_argument('--num_train_steps', type=int, default=100)
     group.add_argument('--num_warmup_steps', type=int, default=0)
-    group.add_argument('--zero_stage', type=str, default='0')
+    group.add_argument('--zero_stage', type=str, default='1')
     group.add_argument("--micro_batch", action="store", default=1, type=int)
     group.add_argument("--accumulation_step", action="store", default=11, type=int)
     group.add_argument("--num_steps_per_device", action="store", default=1, type=int)
@@ -61,9 +61,10 @@ def add_train_args(parser):
     group.add_argument("--dataset_keep_in_memory", action="store_true")
     group.add_argument("--pretrain", action="store_true")
     group.add_argument("--random_nope",action="store_true")
-    group.add_argument("--num_tokens", action="store", default=15600000000, type=int)
+    group.add_argument("--num_tokens", action="store", default=156, type=int,help='number of token in billions')
     group.add_argument("--use_custom_llama", action='store_true')
     group.add_argument('--checkpoint_dir', type=str, default='checkpoints')
+    group.add_argument('--continual', action='store_true', help='continual training if checkpoint exists')
     group.add_argument('--resume', action='store_true', help='Resume training if checkpoint exists')
     group.add_argument('--save_interval', type=int, default=1, help='Save checkpoint every N epochs')
     group.add_argument('--resume_tag', type=str, default="latest", help='Checkpoint tag to resume from')
